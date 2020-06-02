@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+</head>
+<style>
+    .split {
+      height: 100%;
+
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+    .leftside {
+        left: 0;
+        width: 20%;
+    }
+    .rightside {
+        right: 0;
+        width: 80%;
+    }
+
+    table {
+        width:100%;
+    }
+
+</style>
+<body>
+<div id="icaosearch">
+    <div class="split leftside">
+        <div class="leftcontent">
+            <h2>Wyszukaj ICAO</h2>
+            <input type="text">
+
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="firstname">ICAO</th>
+
+                    </tr>
+                </thead>
+              <tr v-for="airport in all_airports">
+                  <td><input type="checkbox" :value="airport" v-model="selected_airports"></td>
+                <td>[[ airport.icao ]]</td>
+              </tr>
+              <tr>
+
+              </tr>
+
+            </table>
+
+        </div>
+    </div>
+    <div class="split rightside">
+        <div class="rightcontent">
+            <div class="table1">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th class="firstname">ICAO</th>
+                        <th class="lastname">Jepp height</th>
+                        <th class="ageof">New height</th>
+                        <th class="ageof">diff</th>
+                    </tr>
+                </thead>
+              <tr v-for="airport in selected_airports">
+                <td>[[ airport.icao ]]</td>
+                <td>[[ airport.height_before ]]</td>
+                <td>[[ airport.height_after ]]</td>
+                <td>[[ airport.diff ]]</td>
+              </tr>
+              <tr>
+
+              </tr>
+
+            </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+var heights = new Vue({
+    el: "#icaosearch",
+    delimiters: ["[[", "]]"],
+    data: {
+      searchQuery: "",
+      selected_airports: [
+
+      ],
+
+        all_airports: []
+    },
+
+    methods:{
+        getAllIcaos: function () {
+            var self = this
+            axios.get('/getallicaos/')
+             .then(function (response) {
+                 console.log(response.data)
+                 for(var i =0; i < response.data.all_icaos.length; i++){
+                     self.all_airports.push(response.data.all_icaos[i])
+                 }
+             })
+             .catch(function (error) {
+                 console.log(error);
+             });
+        }
+    },
+
+    beforeMount(){
+        this.getAllIcaos()
+    }
+  });
+</script>
+</html>
